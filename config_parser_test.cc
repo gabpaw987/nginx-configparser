@@ -10,11 +10,18 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
-TEST(NginxConfigParserTest, DocConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
+class NginxConfigTest : public::testing::Test {
+protected:
+	NginxConfigParser parser_;
+	NginxConfig out_config_;
 
-  bool success = parser.Parse("nginx_doc_config", &out_config);
+	bool ParseFromFile(const char* filename){
+		return parser_.Parse(filename, &out_config_);
+	}
+};
+
+TEST_F(NginxConfigTest, DocConfig) {
+  bool success = ParseFromFile("nginx_doc_config");
 
   EXPECT_TRUE(success);
 }
@@ -25,31 +32,22 @@ TEST(NginxConfigParserTest, DocConfig) {
 //outlined in class. I did not fix anything related to
 //this due to such cases existing in the full nginx
 //example config.
-TEST(NginxConfigParserTest, MissingSemicolonInConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
-
-  bool success = parser.Parse("example_config2", &out_config);
+TEST_F(NginxConfigTest, MissingSemicolonInConfig) {
+  bool success = ParseFromFile("example_config2");
 
   EXPECT_TRUE(success);
 }
 
 //This test failed before the bugfix
-TEST(NginxConfigParserTest, UnbalancedCurlyBracesInConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
-
-  bool success = parser.Parse("example_config3", &out_config);
+TEST_F(NginxConfigTest, UnbalancedCurlyBracesInConfig) {
+  bool success = ParseFromFile("example_config3");
 
   EXPECT_FALSE(success);
 }
 
 //This test failed before the bugfix
-TEST(NginxConfigParserTest, DoubleCompositeStatementInConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
-
-  bool success = parser.Parse("example_config4", &out_config);
+TEST_F(NginxConfigTest, DoubleCompositeStatementInConfig) {
+  bool success = ParseFromFile("example_config4");
 
   EXPECT_TRUE(success);
 }
